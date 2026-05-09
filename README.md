@@ -44,13 +44,13 @@ The LLM decides which tools to call and synthesizes the results into a natural l
 
 ## Evals
 
-The project includes a LangSmith-integrated eval harness. See [evals/README.md](evals/README.md) for details on running experiments, the dataset format, and the three scoring dimensions (tool selection, argument accuracy, response quality).
+The project includes a LangSmith-integrated eval harness with four scoring dimensions: tool selection, argument accuracy, response terms, and an LLM-as-judge response quality score. The judge prompt is managed in LangSmith for no-code iteration. See [evals/README.md](evals/README.md) for the full workflow.
 
 ## Environment
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `ANTHROPIC_API_KEY` | Yes | Powers the LLM (Claude) |
-| `LANGSMITH_API_KEY` | For evals | LangSmith experiment tracking |
+| `LANGSMITH_API_KEY` | For evals | LangSmith experiment tracking + prompt management |
 | `LANGCHAIN_TRACING_V2` | For tracing | Set to `true` to enable |
 | `LANGCHAIN_PROJECT` | For tracing | LangSmith project name |

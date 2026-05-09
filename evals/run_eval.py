@@ -144,10 +144,12 @@ def response_terms(outputs: dict, reference_outputs: dict) -> dict:
 def response_quality(inputs: dict, outputs: dict) -> dict:
     """LLM-as-judge evaluator for overall response quality.
 
-    Scores the agent's response on a 0-1 scale across four criteria:
-    accuracy, completeness, clarity, and appropriate use of data.
+    Pulls the judge prompt from LangSmith (struct-judge-response-quality),
+    so you can iterate on the prompt in the LangSmith UI without code changes.
+    Falls back to a local prompt if LangSmith is unavailable.
     """
     from langchain_anthropic import ChatAnthropic
+    from langsmith import Client
 
     from struct_agent.settings import Settings
 
@@ -158,28 +160,30 @@ def response_quality(inputs: dict, outputs: dict) -> dict:
     response_content = messages[-1].content
     question = inputs.get("question", "")
 
-    judge_prompt = f"""\
-You are evaluating a financial markets AI agent. The user asked a question and \
-the agent responded using real market data tools (stock quotes, options chains, \
-price history, institutional holders).
+    # Pull versioned prompt from LangSmith, fall back to local
+    try:
+        client = Client()
+        prompt = client.pull_prompt("struct-judge-response-quality")
+    except Exception:
+        from langchain_core.prompts import ChatPromptTemplate
 
-Rate the response on a scale of 0.0 to 1.0 based on these criteria:
-- **Accuracy**: Does it correctly interpret and present the data it retrieved?
-- **Completeness**: Does it address all parts of the user's question?
-- **Clarity**: Is the response well-organized and easy to understand?
-- **Data usage**: Does it cite specific numbers rather than speaking vaguely?
-
-User question: {question}
-
-Agent response:
-{response_content}
-
-Respond with ONLY a JSON object in this exact format, nothing else:
-{{"score": <float 0.0-1.0>, "reason": "<one sentence>"}}"""
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You are evaluating a financial markets AI agent. Rate the response "
+                    "on 0.0-1.0 for accuracy, completeness, clarity, and data usage.\n\n"
+                    "Respond with ONLY a JSON object: "
+                    '{{"score": <float 0.0-1.0>, "reason": "<one sentence>"}}',
+                ),
+                ("human", "User question: {question}\n\nAgent response:\n{response}"),
+            ]
+        )
 
     settings = Settings()
     judge = ChatAnthropic(model="claude-haiku-4-5-20251001", api_key=settings.anthropic_api_key)
-    result = judge.invoke(judge_prompt)
+    chain = prompt | judge
+    result = chain.invoke({"question": question, "response": response_content})
 
     try:
         content = result.content.strip()
