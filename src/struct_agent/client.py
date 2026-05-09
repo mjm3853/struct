@@ -161,7 +161,7 @@ def get_institutional_holders(symbol: str) -> list[InstitutionalHolder]:
                 holder=str(row.get("Holder", "")),
                 shares=int(row.get("Shares", 0)),
                 date_reported=str(row.get("Date Reported", "")),
-                pct_held=float(row.get("% Out", 0)),
+                pct_held=float(row.get("pctHeld", row.get("% Out", 0))),
                 value=int(row.get("Value", 0)),
             )
         )

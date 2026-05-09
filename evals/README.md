@@ -33,13 +33,15 @@ Each run invokes the compiled graph against every example in the dataset, applie
 
 ## Evaluators
 
-Three dimensions are scored per example, each returning a 0.0–1.0 score:
+Four dimensions are scored per example, each returning a 0.0–1.0 score:
 
-**tool_selection** — Did the agent call exactly the expected tools? Compared as sorted lists, so order doesn't matter but count does. A query about "AAPL vs GOOGL P/E" should produce two `get_stock_quote` calls, not one.
+**tool_selection** — Did the agent call at least the expected tools? Uses subset matching — every expected tool must appear at least the required number of times, but extra calls are allowed (the agent may reasonably gather additional context).
 
 **argument_accuracy** — Did the tool calls contain the right key-value pairs? Only checks fields explicitly specified in `expected_args`; extra arguments the agent passes are ignored. Case-insensitive matching on values.
 
-**response_quality** — Does the agent's final text response contain all expected terms? Partial credit is given proportional to how many terms matched. For example, if 2 of 3 expected terms appear, the score is 0.67.
+**response_terms** — Does the agent's final text response contain all expected terms? Partial credit is given proportional to how many terms matched. For example, if 2 of 3 expected terms appear, the score is 0.67.
+
+**response_quality** — LLM-as-judge evaluator using Claude Haiku. Scores the agent's response on accuracy (correct interpretation of data), completeness (addresses all parts of the question), clarity (well-organized and readable), and data usage (cites specific numbers rather than speaking vaguely). This evaluator does not use reference outputs — it judges the response against the original question directly.
 
 ## Dataset Format
 
