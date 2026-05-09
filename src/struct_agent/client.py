@@ -93,18 +93,33 @@ def get_option_expirations(symbol: str) -> list[str]:
 def get_option_chain(symbol: str, expiration: str) -> OptionChain:
     chain = yf.Ticker(symbol).option_chain(expiration)
 
+    def _safe_int(val, default=0):
+        import math
+
+        if val is None or (isinstance(val, float) and math.isnan(val)):
+            return default
+        return int(val)
+
+    def _safe_float(val, default=0.0):
+        import math
+
+        if val is None or (isinstance(val, float) and math.isnan(val)):
+            return default
+        return float(val)
+
     def parse_contracts(df) -> list[OptionContract]:
         contracts = []
         for _, row in df.iterrows():
+            vol = _safe_int(row.get("volume"), default=0)
             contracts.append(
                 OptionContract(
                     strike=float(row["strike"]),
-                    bid=float(row.get("bid", 0)),
-                    ask=float(row.get("ask", 0)),
-                    last_price=float(row.get("lastPrice", 0)),
-                    volume=int(row["volume"]) if row.get("volume") else None,
-                    open_interest=int(row.get("openInterest", 0)),
-                    implied_volatility=float(row.get("impliedVolatility", 0)),
+                    bid=_safe_float(row.get("bid")),
+                    ask=_safe_float(row.get("ask")),
+                    last_price=_safe_float(row.get("lastPrice")),
+                    volume=vol if vol > 0 else None,
+                    open_interest=_safe_int(row.get("openInterest")),
+                    implied_volatility=_safe_float(row.get("impliedVolatility")),
                     in_the_money=bool(row.get("inTheMoney", False)),
                 )
             )

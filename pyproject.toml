@@ -13,6 +13,8 @@ dependencies = [
     "typer>=0.15",
     "rich>=13.0",
     "langgraph-cli[inmem]>=0.4.25",
+    "langsmith>=0.8.3",
+    "openevals>=0.2.0",
 ]
 
 [project.scripts]

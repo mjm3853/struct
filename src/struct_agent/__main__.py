@@ -1,12 +1,17 @@
 """CLI entry point for the struct agent."""
 
 import asyncio
+import warnings
 
-import typer
-from rich.console import Console
-from rich.markdown import Markdown
+from langchain_core._api.deprecation import LangChainPendingDeprecationWarning
 
-from struct_agent.graph import graph as agent_graph
+warnings.filterwarnings("ignore", category=LangChainPendingDeprecationWarning)
+
+import typer  # noqa: E402
+from rich.console import Console  # noqa: E402
+from rich.markdown import Markdown  # noqa: E402
+
+from struct_agent.graph import graph as agent_graph  # noqa: E402
 
 app = typer.Typer(help="Chat with a financial markets agent powered by yfinance data.")
 console = Console()

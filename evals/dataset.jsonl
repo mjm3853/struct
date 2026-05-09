@@ -1,0 +1,10 @@
+{"input": "What's Apple's current stock price?", "expected_tools": ["get_stock_quote"], "expected_args": {"get_stock_quote": {"ticker": "AAPL"}}, "expected_in_response": ["AAPL", "Price"]}
+{"input": "How has MSFT performed over the last 3 months?", "expected_tools": ["get_price_history"], "expected_args": {"get_price_history": {"ticker": "MSFT"}}, "expected_in_response": ["MSFT"]}
+{"input": "Show me the options chain for TSLA expiring nearest term", "expected_tools": ["get_option_chain"], "expected_args": {"get_option_chain": {"ticker": "TSLA"}}, "expected_in_response": ["TSLA"]}
+{"input": "Who are the biggest institutional holders of NVDA?", "expected_tools": ["get_institutional_holders"], "expected_args": {"get_institutional_holders": {"ticker": "NVDA"}}, "expected_in_response": ["NVDA"]}
+{"input": "Compare the P/E ratios of AAPL and GOOGL", "expected_tools": ["get_stock_quote", "get_stock_quote"], "expected_args": {}, "expected_in_response": ["P/E", "AAPL", "GOOGL"]}
+{"input": "What's the put/call volume situation for SPY options?", "expected_tools": ["get_option_chain"], "expected_args": {"get_option_chain": {"ticker": "SPY"}}, "expected_in_response": ["SPY"]}
+{"input": "Is AMZN near its 52-week high or low?", "expected_tools": ["get_stock_quote"], "expected_args": {"get_stock_quote": {"ticker": "AMZN"}}, "expected_in_response": ["52-week", "AMZN"]}
+{"input": "Show me weekly candles for QQQ over the past year", "expected_tools": ["get_price_history"], "expected_args": {"get_price_history": {"ticker": "QQQ", "period": "1y", "interval": "1wk"}}, "expected_in_response": ["QQQ"]}
+{"input": "What are the most actively traded call options on META right now?", "expected_tools": ["get_option_chain"], "expected_args": {"get_option_chain": {"ticker": "META"}}, "expected_in_response": ["META", "CALLS"]}
+{"input": "Give me a full picture of NFLX — price, recent trend, and who owns it", "expected_tools": ["get_stock_quote", "get_price_history", "get_institutional_holders"], "expected_args": {}, "expected_in_response": ["NFLX"]}

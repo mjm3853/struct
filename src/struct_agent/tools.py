@@ -46,16 +46,21 @@ def get_option_chain(
     signals fresh positioning. Elevated IV indicates the market expects
     larger moves.
 
+    If no expiration is provided, automatically uses the nearest-term
+    expiration and also lists other available dates.
+
     Args:
         ticker: Stock ticker symbol (e.g. AAPL, TSLA).
-        expiration: Expiration date as YYYY-MM-DD. If omitted, lists available dates.
+        expiration: Expiration date as YYYY-MM-DD. If omitted, uses nearest expiration.
         option_type: "calls", "puts", or "both".
         min_volume: Only show contracts with at least this many contracts traded.
         max_results: Max contracts to return per side (calls/puts).
     """
+    exps = client.get_option_expirations(ticker)
+    if not exps:
+        return f"No options data available for {ticker}."
     if not expiration:
-        exps = client.get_option_expirations(ticker)
-        return f"Available expirations for {ticker}: {', '.join(exps[:15])}"
+        expiration = exps[0]
 
     chain = client.get_option_chain(ticker, expiration)
     lines = [f"Options chain for {chain.symbol} exp {chain.expiration}:", ""]
@@ -81,6 +86,10 @@ def get_option_chain(
         fmt_side(chain.calls, "CALLS")
     if option_type in ("both", "puts"):
         fmt_side(chain.puts, "PUTS")
+
+    other_exps = [e for e in exps if e != expiration][:10]
+    if other_exps:
+        lines.append(f"\n  Other expirations: {', '.join(other_exps)}")
 
     return "\n".join(lines)
 
